@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#173f35">
+  <meta name="description" content="NAQAA Field Lab — سجل ميداني للمواقع والصور والإحداثيات وبيانات المسح.">
+  <title>NAQAA Field Lab | مختبر نقاء الميداني</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="navigation.css">
+  <link rel="stylesheet" href="subscriptions.css">
+  <link rel="stylesheet" href="sharing.css">
+  <link rel="stylesheet" href="wallet.css">
+  <link rel="stylesheet" href="research-analysis.css">
+  <link rel="stylesheet" href="terrain-profile.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark" aria-hidden="true">ن</div>
+    <div class="brand">
+      <p class="eyebrow">NAQAA HOLDING</p>
+      <h1>مختبر نقاء الميداني</h1>
+      <p class="subtitle">توثيق المواقع وتحليل صور الأرض</p>
+    </div>
+    <span class="local-badge"><span></span> حفظ محلي ومزامنة سحابية</span>
+  </header>
+
+  <main class="container">
+    <section class="intro panel">
+      <div>
+        <p class="eyebrow">FIELD RESEARCH WORKSPACE</p>
+        <h2>من الملاحظة الميدانية إلى تقرير موثّق</h2>
+        <p>سجّل الموقع والصور والملاحظات في مكان واحد. لن نطلب الموقع أو الكاميرا إلا عندما تختار ذلك.</p>
+      </div>
+      <div class="intro-symbol" aria-hidden="true">⌖</div>
+    </section>
+
+    <div class="notice" role="note">
+      <strong>تنبيه علمي:</strong> الصور الفضائية وحدها لا تثبت وجود آثار أو تجاويف أو مياه جوفية. تُعرض النتائج كقرائن تحتاج إلى تحقق ميداني ومراجع موثوقة.
+    </div>
+
+    <section class="grid-layout">
+      <div class="panel form-panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">NEW OBSERVATION</p><h2>إنشاء سجل ميداني</h2></div>
+          <span class="step">01</span>
+        </div>
+        <form id="record-form">
+          <label for="site-name">اسم الموقع أو رمز العينة <span class="required">*</span></label>
+          <input id="site-name" name="siteName" required maxlength="100" placeholder="مثال: الموقع A-01">
+
+          <label for="observation-type">نوع الملاحظة</label>
+          <select id="observation-type" name="type">
+            <option value="surface">ملاحظة سطحية / تضاريس</option>
+            <option value="rock">صخر أو نقش محتمل</option>
+            <option value="satellite">ملاحظة من صورة فضائية</option>
+            <option value="gpr">بيانات رادار اختراق الأرض (GPR)</option>
+            <option value="ert">بيانات المقاومة الكهربائية (ERT)</option>
+            <option value="water">ملاحظة مرتبطة بالمياه</option>
+            <option value="other">أخرى</option>
+          </select>
+
+          <div class="field-label-row">
+            <label>الإحداثيات</label>
+            <button class="button button-secondary button-small" type="button" id="location-button">⌖ تحديد موقعي</button>
+          </div>
+          <p id="location-status" class="helper" aria-live="polite">لم يتم طلب الموقع. اضغط الزر إذا أردت إرفاق الإحداثيات.</p>
+          <div class="two-fields">
+            <div><label for="latitude">خط العرض</label><input id="latitude" inputmode="decimal" placeholder="—"></div>
+            <div><label for="longitude">خط الطول</label><input id="longitude" inputmode="decimal" placeholder="—"></div>
+          </div>
+          <label for="coordinate-source">مصدر الإحداثيات / الدقة</label>
+          <input id="coordinate-source" placeholder="مثال: GPS الهاتف، الدقة 8 م">
+
+          <div class="field-label-row">
+            <label>الصور الميدانية</label>
+            <button class="button button-secondary button-small" type="button" id="camera-button">فتح الكاميرا</button>
+          </div>
+          <div class="camera-box">
+            <video id="camera-preview" autoplay playsinline muted hidden></video>
+            <div id="camera-placeholder" class="camera-placeholder"><span>▧</span><p>يمكنك التقاط صورة أو اختيار صور من جهازك.</p></div>
+            <button id="capture-button" type="button" class="button button-primary" hidden>التقاط الصورة</button>
+          </div>
+          <label for="photo-input">اختيار صور من الجهاز</label>
+          <input id="photo-input" type="file" accept="image/*" multiple>
+          <p class="helper">حد أقصى 6 صور لكل عملية توثيق أو تحليل.</p>
+          <div id="photo-preview" class="photo-preview" aria-live="polite"></div>
+
+          <label for="notes">الملاحظات الميدانية</label>
+          <textarea id="notes" rows="4" maxlength="5000" placeholder="صف ما تراه دون الجزم بتفسير غير متحقق..."></textarea>
+
+          <label for="measurements">قياسات أو بيانات مسح (اختياري)</label>
+          <textarea id="measurements" rows="2" maxlength="3000" placeholder="الأبعاد، وجود مقياس بالصورة، أو ملاحظات GPR / ERT"></textarea>
+
+          <button type="submit" class="button button-primary button-full">حفظ السجل ومزامنته عند تسجيل الدخول</button>
+          <p class="helper">تُحفظ السجلات محليًا أولًا. بعد تسجيل الدخول وضبط الخادم، تُزامن السجلات والصور مع حسابك السحابي.</p>
+        </form>
+      </div>
+
+      <div class="right-column">
+        <section class="panel map-panel">
+          <div class="section-heading">
+            <div><p class="eyebrow">LOCATION VIEW</p><h2>خريطة الموقع</h2></div>
+            <span class="step">02</span>
+          </div>
+          <div class="map-controls">
+            <button id="street-layer" type="button" class="layer-button active">خريطة الشوارع</button>
+            <button id="satellite-layer" type="button" class="layer-button">صور فضائية</button>
+          </div>
+          <div id="map" role="img" aria-label="خريطة للمواقع التي تختار تسجيلها"></div>
+          <p class="helper">الخريطة تحتاج إلى اتصال بالإنترنت. اختر طبقة الصور الفضائية لمعاينة صورة سطح الأرض، وليست تحليلًا أثريًا آليًا.</p>
+          <a id="open-map-link" class="text-link" href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer">فتح الخريطة في نافذة مستقلة ↗</a>
+        </section>
+
+        <section class="panel records-panel">
+          <div class="section-heading">
+            <div><p class="eyebrow">FIELD LOGBOOK</p><h2>السجلات المحفوظة</h2></div>
+            <span id="record-count" class="count">0</span>
+          </div>
+          <div id="records-list" class="records-list">
+            <div class="empty-state"><span>⌁</span><h3>لا توجد سجلات بعد</h3><p>أنشئ أول سجل لتظهر هنا المواقع والصور والملاحظات.</p></div>
+          </div>
+          <div class="export-actions">
+            <button id="export-button" type="button" class="button button-secondary" disabled>تصدير السجلات JSON</button>
+            <button id="clear-button" type="button" class="button button-quiet" disabled>حذف جميع السجلات</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="panel account-panel" id="account">
+      <div class="section-heading">
+        <div><p class="eyebrow">ACCOUNT & USAGE</p><h2>حساب المستخدم وحصة الاستخدام</h2></div>
+        <span class="step">02</span>
+      </div>
+      <p class="account-intro">أنشئ حسابًا أو سجّل الدخول لعرض حصتك المحفوظة على الخادم. يلزم ضبط عنوان API ونشر الخادم أولًا.</p>
+      <div class="account-forms">
+        <form id="register-form" class="account-form">
+          <h3>إنشاء حساب</h3>
+          <label for="register-email">البريد الإلكتروني</label>
+          <input id="register-email" name="email" type="email" autocomplete="email" required maxlength="320" placeholder="name@example.com">
+          <label for="register-password">كلمة المرور (10 أحرف على الأقل)</label>
+          <input id="register-password" name="password" type="password" autocomplete="new-password" minlength="10" maxlength="128" required>
+          <button class="button button-primary button-full" type="submit">إنشاء حساب تجريبي</button>
+        </form>
+        <form id="login-form" class="account-form">
+          <h3>تسجيل الدخول</h3>
+          <label for="login-email">البريد الإلكتروني</label>
+          <input id="login-email" name="email" type="email" autocomplete="email" required maxlength="320" placeholder="name@example.com">
+          <label for="login-password">كلمة المرور</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" maxlength="128" required>
+          <button class="button button-secondary button-full" type="submit">دخول</button>
+        </form>
+      </div>
+      <div id="account-status" class="plan-notice" role="status" aria-live="polite">الخادم غير مضبوط في هذه النسخة. لن تُرسل بيانات الدخول إلى أي جهة قبل إعداد عنوان API.</div>
+      <div id="usage-panel" class="usage-panel" hidden>
+        <div class="usage-heading"><h3>ملخص الحصة</h3><button id="refresh-usage" class="button button-secondary" type="button">تحديث</button></div>
+        <p id="usage-plan"></p>
+        <div class="usage-grid"><div><span>المواقع المستخدمة</span><strong id="sites-usage">—</strong></div><div><span>الاستفسارات المستخدمة</span><strong id="questions-usage">—</strong></div></div>
+        <p class="helper">عرض الحصة لا يعني توفر التحليل الآلي أو الدفع. لا تفعّل باقة مدفوعة قبل إتمام ربط الدفع والتحقق منه على الخادم.</p>
+        <button id="logout-button" class="button button-secondary" type="button">تسجيل الخروج</button>
+      </div>
+    </section>
+
+    <section class="panel wallet-panel" id="internal-wallet">
+      <div class="section-heading">
+        <div><p class="eyebrow">SECURE CHECKOUT</p><h2>الدفع والاشتراكات</h2></div>
+        <span class="step">03</span>
+      </div>
+      <p class="pricing-intro">شراء الباقات يتم بعملة USDT على شبكة TRON (TRC20). لا يبدأ الدفع حتى يعلن الخادم جاهزيته، ولا يتفعّل الاشتراك إلا بعد تحقق الخادم من المعاملة والمبلغ والعنوان وعدد التأكيدات.</p>
+      <div class="wallet-summary">
+        <div><span>حالة الدفع</span><strong id="wallet-balance">غير مؤكدة</strong><small>لا يُعرض نجاح دفع دون تحقق الخادم</small></div>
+        <div><span>حالة الاتصال</span><strong class="wallet-status" id="wallet-status-label">جارٍ الفحص</strong><small id="wallet-account">فحص إعداد الخادم المالي</small></div>
+      </div>
+      <div class="checkout-form">
+        <label for="payment-plan">اختر الباقة</label>
+        <select id="payment-plan">
+          <option value="daily">الاشتراك اليومي — 10 USDT</option>
+          <option value="weekly">الاشتراك الأسبوعي — 50 USDT</option>
+          <option value="monthly">الاشتراك الشهري — 100 USDT</option>
+        </select>
+        <label for="payment-payer-address">عنوان محفظة المرسل على شبكة TRON</label>
+        <input id="payment-payer-address" type="text" autocomplete="off" inputmode="text" required maxlength="40" placeholder="T... عنوان الاستقبال من محفظتك الشخصية">
+        <p class="helper">يجب أن ترسل من عنوان المحفظة نفسه. لا تستخدم إيداعًا من منصة تداول أو عنوان طرف ثالث إذا لم يكن عنوان الإرسال ظاهرًا لديك.</p>
+        <button class="button button-primary button-full" id="wallet-deposit-request" type="button">إنشاء طلب دفع آمن</button>
+      </div>
+      <div id="payment-instructions" class="payment-instructions" hidden>
+        <h3>تعليمات الدفع</h3>
+        <p>أرسل المبلغ المحدد فقط من عنوان محفظتك الذي أدخلته إلى العنوان المعروض على شبكة TRON (TRC20). سيتحقق الخادم من المرسل الفعلي لمنع نسب تحويل شخص آخر إلى حسابك.</p>
+        <div class="payment-value"><span>المبلغ المطلوب</span><strong id="payment-amount">—</strong></div>
+        <label for="payment-receiving-address">عنوان الاستقبال</label>
+        <textarea id="payment-receiving-address" rows="2" readonly></textarea>
+        <button class="button button-secondary button-full" id="wallet-copy-address" type="button">نسخ عنوان الاستقبال</button>
+        <p class="helper" id="payment-expiry"></p>
+        <label for="payment-txid">معرّف المعاملة (Transaction ID)</label>
+        <input id="payment-txid" inputmode="text" autocomplete="off" maxlength="64" placeholder="64 خانة سداسية عشرية">
+        <button class="button button-primary button-full" id="wallet-verify-payment" type="button">التحقق من المعاملة وتفعيل الاشتراك</button>
+      </div>
+      <div class="wallet-actions">
+        <button class="button button-secondary" id="wallet-refresh" type="button">فحص حالة الدفع</button>
+        <button class="button button-secondary" id="wallet-history" type="button">تحديث سجل المعاملات</button>
+      </div>
+      <h3>سجل معاملات الدفع</h3>
+      <div id="wallet-ledger" class="wallet-ledger"><p class="helper">لا توجد معاملات مرتبطة بهذا الحساب بعد.</p></div>
+      <p class="helper" id="wallet-notice" role="status" aria-live="polite">لا ترسل USDT قبل إنشاء طلب دفع صالح داخل التطبيق والتأكد من الشبكة والمبلغ والعنوان.</p>
+    </section>
+
+    <section class="panel pricing-panel" id="subscriptions">
+      <div class="section-heading">
+        <div><p class="eyebrow">PLANS & ACCESS</p><h2>باقات مختبر نقاء</h2></div>
+        <span class="step">04</span>
+      </div>
+      <p class="pricing-intro">اختر الباقة المناسبة لحجم عملك الميداني. تُفعّل الباقة المدفوعة فقط بعد تحقق الخادم من معاملة USDT الصحيحة.</p>
+      <div class="plans-grid">
+        <article class="plan-card plan-trial">
+          <span class="plan-label">للتجربة</span><h3>التجربة المجانية</h3><p class="plan-price">$0 <small>/ مجانًا</small></p>
+          <ul><li>موقعان كحد أقصى</li><li>10 استفسارات إجمالًا</li><li>تقرير واحد لكل موقع عند توفر التحليل</li></ul>
+          <button class="button button-secondary button-full plan-info" type="button" data-plan="التجربة المجانية">تفاصيل الباقة</button>
+        </article>
+        <article class="plan-card">
+          <span class="plan-label">استخدام قصير</span><h3>الاشتراك اليومي</h3><p class="plan-price">$10 <small>/ يوم</small></p>
+          <ul><li>موقعان خلال مدة الاشتراك</li><li>20 استفسارًا يوميًا</li><li>تقرير واحد لكل موقع</li></ul>
+          <button class="button button-secondary button-full plan-info" type="button" data-plan="الاشتراك اليومي">تفاصيل الباقة</button>
+        </article>
+        <article class="plan-card">
+          <span class="plan-label">عمل ميداني</span><h3>الاشتراك الأسبوعي</h3><p class="plan-price">$50 <small>/ 7 أيام</small></p>
+          <ul><li>10 مواقع خلال 7 أيام</li><li>100 استفسار خلال الأسبوع</li><li>تقرير واحد لكل موقع</li></ul>
+          <button class="button button-secondary button-full plan-info" type="button" data-plan="الاشتراك الأسبوعي">تفاصيل الباقة</button>
+        </article>
+        <article class="plan-card plan-featured">
+          <span class="plan-label">للاستخدام المنتظم</span><h3>الاشتراك الشهري</h3><p class="plan-price">$100 <small>/ 30 يومًا</small></p>
+          <ul><li>30 موقعًا خلال 30 يومًا</li><li>300 استفسار خلال الشهر</li><li>تقرير واحد لكل موقع</li></ul>
+          <button class="button button-primary button-full plan-info" type="button" data-plan="الاشتراك الشهري">تفاصيل الباقة</button>
+        </article>
+      </div>
+      <div class="plan-notice" id="plan-message" role="status" aria-live="polite">تنبيه: الباقات للعرض والتخطيط فقط. الدفع، حساب المستخدم، واحتساب الحصص تحتاج إلى خادم آمن وتكامل دفع قبل إطلاق الاشتراكات.</div>
+      <p class="helper">الموقع المقصود هنا سجل موقع جديد ضمن حصة الباقة. وحدود الاستخدام مقترحة وقابلة للتعديل قبل الإطلاق.</p>
+    </section>
+
+
+    <section class="panel distribution-panel" id="share-app">
+      <div class="section-heading">
+        <div><p class="eyebrow">APP DISTRIBUTION</p><h2>مشاركة مختبر نقاء وتثبيته</h2></div>
+        <span class="step">05</span>
+      </div>
+      <p class="distribution-intro">شارك رابط النسخة المنشورة عبر التطبيقات، أو انقل ملف APK بين أجهزة Android. يجب نشر رابط HTTPS فعلي أولًا؛ رابط المعاينة المحلية لا يصلح للمشاركة.</p>
+      <div class="share-buttons">
+        <button type="button" class="button button-primary" id="native-share-button">مشاركة الرابط من الهاتف</button>
+        <button type="button" class="button button-secondary" id="copy-share-link">نسخ رابط التطبيق</button>
+        <a class="button button-secondary" id="whatsapp-share" href="https://wa.me/" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        <a class="button button-secondary" id="telegram-share" href="https://t.me/share/url" target="_blank" rel="noopener noreferrer">Telegram</a>
+        <a class="button button-secondary" id="facebook-share" href="https://www.facebook.com/sharer/sharer.php" target="_blank" rel="noopener noreferrer">Facebook</a>
+      </div>
+      <div class="distribution-notes">
+        <div><strong>Bluetooth أو Quick Share</strong><p>بعد تنزيل ملف APK النهائي إلى هاتف Android، افتح تطبيق «الملفات» أو «التنزيلات»، اختر ملف APK، ثم «مشاركة» واختر Bluetooth أو Quick Share. قد يلزم السماح بتثبيت التطبيقات من هذا المصدر على جهاز المستلم.</p></div>
+        <div><strong>قبل التثبيت</strong><p>لا تثبّت ملفًا إلا إذا كان من رابط رسمي موثوق. نسخة Debug للتجربة وليست إصدارًا نهائيًا للمتاجر. قد تظهر تحذيرات أمان عند تثبيت APK خارج المتجر.</p></div>
+      </div>
+      <p class="helper" id="share-status" role="status" aria-live="polite">روابط المشاركة ستستخدم عنوان الصفحة الحالية. لا يظهر رابط تنزيل APK هنا إلا بعد نجاح البناء ونشر الملف في مكان متاح.</p>
+    </section>
+
+
+    <section class="panel evidence-panel" id="evidence-analysis">
+      <div class="section-heading">
+        <div><p class="eyebrow">EVIDENCE NOTEBOOK</p><h2>توثيق الإشارات وتحضير تقرير ميداني</h2></div>
+        <span class="step">06</span>
+      </div>
+      <div class="evidence-warning"><strong>حدود علمية مهمة:</strong> هذه الوحدة تنظّم الأدلة والملاحظات ولا تكشف الدفائن أو تفسّر الرموز آليًا. لا تحفر ولا تلمس نقشًا أو موقعًا أثريًا اعتمادًا على تخمين؛ استشر مختصًا والجهات المعنية بحماية التراث.</div>
+      <form id="evidence-report-form">
+        <div class="evidence-grid">
+          <div><label for="evidence-site-name">اسم الموقع أو رقم السجل *</label><input id="evidence-site-name" required maxlength="100" placeholder="مثال: NQ-LOC-001"></div>
+          <div><label for="evidence-feature-type">نوع العلامة المرصودة</label><select id="evidence-feature-type"><option value="rock_mark">علامة على صخر / نقش محتمل</option><option value="surface_shape">شكل تضاريسي سطحي</option><option value="satellite_anomaly">اختلاف ظاهر في صورة فضائية</option><option value="historic_structure">بقايا منشأة أو بناء محتمل</option><option value="gpr_profile">مقطع رادار اختراق الأرض GPR</option><option value="ert_profile">بيانات المقاومة الكهربائية ERT</option><option value="other">أخرى / غير معروف</option></select></div>
+          <div><label for="evidence-source">مصدر الدليل</label><select id="evidence-source"><option value="field_photo">صورة ميدانية</option><option value="satellite_imagery">صورة فضائية / خريطة</option><option value="historic_document">وثيقة أو مرجع تاريخي</option><option value="gpr">جهاز GPR</option><option value="ert">جهاز ERT</option><option value="other">مصدر آخر</option></select></div>
+          <div><label for="evidence-source-date">تاريخ الصورة أو المسح (إن عُرف)</label><input id="evidence-source-date" type="date"></div>
+          <div><label for="evidence-latitude">خط العرض</label><input id="evidence-latitude" inputmode="decimal" placeholder="اختياري"></div>
+          <div><label for="evidence-longitude">خط الطول</label><input id="evidence-longitude" inputmode="decimal" placeholder="اختياري"></div>
+        </div>
+        <button class="button button-secondary button-small" type="button" id="copy-current-location">نسخ إحداثيات النموذج الأساسي</button>
+        <label for="evidence-coordinate-note">مصدر الإحداثيات ودقتها</label><input id="evidence-coordinate-note" maxlength="250" placeholder="مثال: GPS الهاتف، دقة ظاهرة 7 أمتار">
+        <label for="evidence-photo">إرفاق صور النقوش أو العلامات (حتى 6 صور، 12 ميغابايت للصورة)</label><input id="evidence-photo" type="file" accept="image/*" multiple>
+        <div id="evidence-photo-preview" class="evidence-photo-preview"></div>
+        <label for="evidence-description">الوصف المباشر لما تراه *</label><textarea id="evidence-description" required rows="3" maxlength="5000" placeholder="الشكل، الأبعاد التقريبية، الاتجاه، مقياس الصورة، حالة السطح..."></textarea>
+        <label for="evidence-hypothesis">تفسير أو فرضية أولية (اختياري)</label><textarea id="evidence-hypothesis" rows="2" maxlength="2500" placeholder="اكتبها كفرضية، لا كحقيقة مؤكدة."></textarea>
+        <label for="evidence-alternatives">تفسيرات بديلة يجب استبعادها</label><textarea id="evidence-alternatives" rows="2" maxlength="2500" placeholder="تعرية طبيعية، أعمال حديثة، ظلال، آثار زراعية أو اختلاف في الإضاءة..."></textarea>
+        <label for="evidence-measurements">القياسات أو بيانات الجهاز</label><textarea id="evidence-measurements" rows="2" maxlength="3000" placeholder="مقياس، نوع الجهاز، إعدادات المسح، عمق/مقياس موثق إن توفر..."></textarea>
+        <label for="evidence-confidence">حالة الملاحظة (ليست درجة ذكاء اصطناعي)</label><select id="evidence-confidence"><option value="unverified">غير متحقق منها</option><option value="needs_expert_review">تحتاج مراجعة مختص</option><option value="supported_by_source">توجد مراجع داعمة مرفقة</option></select>
+        <div class="evidence-actions"><button class="button button-primary" type="submit">إعداد تقرير التوثيق</button><button class="button button-secondary" id="download-evidence-report" type="button" disabled>تنزيل التقرير JSON</button><button class="button button-quiet" id="reset-evidence-report" type="button">مسح النموذج</button></div>
+        <p id="evidence-report-preview" class="evidence-result" role="status" aria-live="polite"></p>
+        <p id="evidence-status" class="helper evidence-helper" role="status" aria-live="polite">حاليًا لا يوجد خادم تحليل منشور لهذه الوحدة؛ اختيار الصور لا يرفعها ولا يشغّل تحليلًا سحابيًا حتى يتم ربط خدمة آمنة.</p>
+      </form>
+    </section>
+
+        <section class="panel terrain-profile-panel" id="terrain-profile">
+      <div class="section-heading">
+        <div><p class="eyebrow">SURFACE & SUBSURFACE PROFILES</p><h2>رسم التضاريس وبيانات ما تحت الأرض</h2></div>
+        <span class="step">07</span>
+      </div>
+      <div class="terrain-note"><strong>حدود القياس:</strong> الرسم الأول يستعمل بيانات ارتفاعات سطح الأرض عبر الإنترنت. أما الرسم الثاني فيعرض قياسات تستوردها من جهاز GPR أو ERT أو مصدر علمي؛ لا يستطيع GPS أو صور الأقمار الصناعية وحدها تأكيد المياه الجوفية أو الفراغات أو الدفائن.</div>
+      <section class="terrain-subsection">
+        <h3>١. المقطع الطبوغرافي ضمن دائرة قطرها الأقصى 50 مترًا</h3>
+        <p class="helper">حدّد الموقع في النموذج الأساسي أولًا. يبقى المقطع داخل منطقة دائرية مركزها إحداثياتك وقطرها لا يتجاوز 50 مترًا. تُجلب 25 عينة ارتفاع تقريبية من خدمة Open-Meteo.</p>
+        <div class="terrain-controls">
+          <div><label for="terrain-distance">طول المقطع (متر، حد أقصى 50)</label><input id="terrain-distance" type="number" min="5" max="50" step="5" value="50"></div>
+          <div><label for="terrain-bearing">الاتجاه (درجة من الشمال)</label><input id="terrain-bearing" type="number" min="0" max="359" step="1" value="90"></div>
+          <button id="terrain-generate" class="button button-primary" type="button">إنشاء رسم الارتفاعات</button>
+        </div>
+        <p id="terrain-status" class="terrain-status" role="status" aria-live="polite">لم يتم طلب بيانات الارتفاعات بعد.</p>
+        <div id="terrain-chart-wrap" class="terrain-chart-wrap" hidden>
+          <svg id="terrain-chart" class="terrain-chart" viewBox="0 0 760 300" role="img" aria-label="رسم ارتفاع التضاريس على طول المقطع"></svg>
+          <p id="terrain-stats" class="terrain-stats"></p>
+          <div class="terrain-actions"><button id="terrain-download" class="button button-secondary" type="button" disabled>تنزيل بيانات المقطع JSON</button></div>
+          <p class="helper">المصدر: Open-Meteo Elevation API. الدقة تتأثر بدقة نموذج الارتفاعات المتاح، وقد لا تمثل التفاصيل الصغيرة على الأرض.</p>
+        </div>
+      </section>
+      <section class="terrain-subsection">
+        <h3>٢. مقطع تحت سطح الأرض ضمن نطاق الموقع المحدد</h3>
+        <p>استورد ملف CSV صادرًا من جهاز مسح أو برنامج مختص. ستُرسم القيم مقابل المسافة والعمق دون اختلاق تفسير جيولوجي.</p>
+        <label for="underground-file">ملف القياسات CSV (حد أقصى 5 ميغابايت)</label>
+        <input id="underground-file" class="terrain-file" type="file" accept=".csv,text/csv">
+        <p class="terrain-csv-example">يجب أن يحتوي الملف على عناوين الأعمدة: <code>distance_m,depth_m,value</code> ثم صف لكل قراءة. تُقبل فقط نقاط المسافة الواقعة ضمن قطر 50 مترًا (0–50 م). القيم هي قياسات جهازك كما هي.</p>
+        <p id="underground-status" class="terrain-status" role="status" aria-live="polite">لم يتم استيراد بيانات تحت السطح.</p>
+        <div id="underground-chart-wrap" class="terrain-chart-wrap" hidden>
+          <svg id="underground-chart" class="terrain-chart terrain-underground-chart" viewBox="0 0 760 330" role="img" aria-label="عرض لوني لبيانات القياس المستوردة حسب المسافة والعمق"></svg>
+          <p id="underground-stats" class="terrain-stats"></p>
+          <div class="terrain-actions"><button id="underground-download" class="button button-secondary" type="button" disabled>تنزيل بيانات المسح JSON</button></div>
+        </div>
+      </section>
+      <div class="terrain-note"><strong>المياه الجوفية والفراغات والدفائن:</strong> قد تساعد القياسات الجيوفيزيائية على تحديد شذوذات تستحق الفحص، لكنها لا تثبت وحدها نوع الهدف. يلزم معرفة الجهاز والمعايرة والجيولوجيا المحلية ومراجعة مختص، كما يجب احترام القوانين وحماية المواقع الأثرية.</div>
+    </section>
+    <section class="panel roadmap">
+      <div><p class="eyebrow">NEXT ANALYSIS MODULES</p><h2>مسارات التطوير العلمي</h2><p>هذه النسخة تبدأ بالتوثيق المنظم؛ وحدات التحليل المتقدم تُضاف بعد توفير مصادر البيانات والمراجع.</p></div>
+      <div class="module-list">
+        <div><span class="module-icon">⌁</span><span><strong>النقوش والصخور</strong><small>توثيق الصور والقياسات والمقارنة بالمراجع</small></span><em>المرحلة التالية</em></div>
+        <div><span class="module-icon">◈</span><span><strong>التضاريس ثلاثية الأبعاد</strong><small>طبقات ارتفاع وكنتور ونماذج تضاريس</small></span><em>المرحلة التالية</em></div>
+        <div><span class="module-icon">⌇</span><span><strong>GPR / ERT</strong><small>استيراد المقاطع وبيانات أجهزة المسح</small></span><em>يتطلب بيانات</em></div>
+      </div>
+    </section>
+    <footer><span>NAQAA FIELD LAB</span><span>نسخة تطوير • حفظ محلي ومزامنة سحابية للحسابات المسجلة</span></footer>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="navigation.js"></script>
+  <script src="api-config.js"></script>
+  <script src="account.js"></script>
+  <script src="subscriptions.js"></script>
+  <script src="sharing.js"></script>
+  <script src="app.js"></script>
+  <script src="wallet.js"></script>
+  <script src="research-analysis.js"></script>
+  <script src="terrain-profile.js"></script>
+</body>
+</html>
