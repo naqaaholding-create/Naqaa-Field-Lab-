@@ -1,0 +1,6 @@
+{
+  "name": "naqaa-field-lab-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-18",
+  "workers_dev": true
+}
